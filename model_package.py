@@ -3,7 +3,7 @@ from sklearn.linear_model import LinearRegression
 
 class ModelPackage:
     
-    def predict(train_data, test_data):
+    def linear_predict(train_data, test_data):
         model = LinearRegression()
 
         X_train = train_data[:, :-1]   
@@ -95,3 +95,35 @@ class ModelPackage:
             
             return y_pred, y_test
 
+
+    class LogisticRegression:
+        
+        def __init__(self):
+            self.coefficients = None
+            self.slopes = None
+            self.intercept = None
+
+        def logistic_regression(self, train_data):  
+        
+            x_train = train_data[:, :-1]
+            y_train = train_data[:, -1]
+            
+            x_train = np.hstack([np.ones((x_train.shape[0], 1)), x_train])
+            
+            coefficients = np.linalg.inv(x_train.T @ x_train) @ x_train.T @ y_train
+            intercept = coefficients[0]
+            slopes = coefficients[1:]
+            
+            self.coefficients = coefficients
+            self.slopes = slopes
+            self.intercept = intercept
+            return slopes, intercept
+
+        def logistic_predict(self, test_data):
+            x_test = test_data[:, :-1]
+            y_test = test_data[:, -1]
+
+            linear_combination = self.intercept + np.sum(self.slopes * x_test, axis=1)
+            y_pred_prob = 1 / (1 + np.exp(-linear_combination))
+            
+            return y_pred_prob, y_test
